@@ -1,0 +1,109 @@
+<html>
+<head>
+<script>
+// https://www.ibm.com/developerworks/community/blogs/e61058ca-3d39-425f-a0a3-f58e749b096d/entry/Lazy_Evaluation_in_Javascript?lang=en
+// http://raganwald.com/2015/02/17/lazy-iteratables-in-javascript.html
+function listPairs(n) {
+	var stream = new Stream(n);
+	//alert("Hello world!!");
+	
+stack.push(1);
+stack.push(2);
+stack.push(3);
+	document.getElementById("results").innerHTML += iteratorSum(stack.iterator()) + "<br>";
+};
+
+function Stream(value) {
+  this.value = value;
+  
+  Object.defineProperty(this, 'next', {
+    get : function() {
+      return new Stream(value + 1);
+    }
+  });
+};
+
+Stream.prototype.takeUntil = function (n, accumulator) {  
+  accumulator = accumulator || [];
+  
+  if (n < this.value) {
+    return;
+  }
+
+  if (n === this.value) {
+    return accumulator;
+  }
+  
+  accumulator.push(this.value);
+  return this.next.takeUntil(n, accumulator)
+};
+
+//--------------------------------------------------------
+
+const Stack1 = () =>
+  ({
+    array:[],
+    index: -1,
+    push: function (value) {
+      return this.array[this.index += 1] = value;
+    },
+    pop: function () {
+      const value = this.array[this.index];
+    
+      this.array[this.index] = undefined;
+      if (this.index >= 0) { 
+        this.index -= 1 
+      }
+      return value
+    },
+    isEmpty: function () {
+      return this.index < 0
+    },
+    iterator: function () {
+      let iterationIndex = this.index;
+      
+      return () => {
+        if (iterationIndex > this.index) {
+          iterationIndex = this.index;
+        }
+        if (iterationIndex < 0) {
+          return {done: true};
+        }
+        else {
+          return {done: false, value: this.array[iterationIndex--]}
+        }
+      }
+    }
+  });
+
+const stack = Stack1();
+
+stack.push("Greetings");
+stack.push("to");
+stack.push("you!")
+
+const iter = stack.iterator();
+iter().value
+  //=> "you!"
+iter().value
+  //=> "to"
+  
+const iteratorSum = (iterator) => {
+  let eachIteration,
+      sum = 0;
+  
+  while ((eachIteration = iterator(), !eachIteration.done)) {
+    sum += eachIteration.value;
+  }
+  return sum
+}
+
+const stack = Stack1();
+
+</script>
+</head>
+<body>
+<button onClick="listPairs(10);">Click this.</button>
+<div id="results"></div>
+</body>
+</html>
